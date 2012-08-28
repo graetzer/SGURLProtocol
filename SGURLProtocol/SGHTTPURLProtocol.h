@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import <CFNetwork/CFNetwork.h>
+#import "SGURLProtocol.h"
 
 @class SGHTTPAuthenticationChallenge;
-@interface SGURLProtocol : NSURLProtocol <NSStreamDelegate, NSURLAuthenticationChallengeSender> {
+@interface SGHTTPURLProtocol : NSURLProtocol <NSStreamDelegate, NSURLAuthenticationChallengeSender> {
     CFHTTPMessageRef _HTTPMessage;
     NSInteger                       _authenticationAttempts;
 }

@@ -11,11 +11,14 @@
 #import <zlib.h>
 
 @interface NSData (Compress)
+// Decompress http deflate encoding
 - (NSData *)zlibInflate;
+
+// Compress http deflate encoding
 - (NSData *)zlibDeflate;
 
-// Decompress
+// Decompress http gzip encoding
 - (NSData *)gzipInflate;
-// Compress
+// Compress http gzip encoding
 - (NSData *)gzipDeflate;
 @end

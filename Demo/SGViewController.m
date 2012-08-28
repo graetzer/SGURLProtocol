@@ -7,7 +7,7 @@
 //
 
 #import "SGViewController.h"
-#import "SGURLProtocol.h"
+#import "SGHTTPURLProtocol.h"
 
 @interface SGViewController ()
 
@@ -24,7 +24,7 @@
                                           sharedHTTPCookieStorage];
     [cookieStorage setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
     
-    [SGURLProtocol registerProtocol];
+    [SGHTTPURLProtocol registerProtocol];
 	// Do any additional setup after loading the view, typically from a nib.
     NSURLRequest *r = [NSURLRequest requestWithURL:
                        [NSURL URLWithString:@"http://www.pagetutor.com/keeper/mystash/secretstuff.html"]
@@ -39,7 +39,7 @@
 {
     self.webView.delegate = nil;
     [self setWebView:nil];
-    [SGURLProtocol unregisterProtocol];
+    [SGHTTPURLProtocol unregisterProtocol];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }

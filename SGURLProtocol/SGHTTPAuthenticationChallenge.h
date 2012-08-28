@@ -15,7 +15,6 @@
 }
 
 - (id)initWithResponse:(CFHTTPMessageRef)response
-    proposedCredential:(NSURLCredential *)credential
   previousFailureCount:(NSInteger)failureCount
        failureResponse:(NSHTTPURLResponse *)URLResponse
                 sender:(id <NSURLAuthenticationChallengeSender>)sender;

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F40395AA15E92F47000F7DFE /* SGURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = F40395A915E92F47000F7DFE /* SGURLProtocol.m */; };
+		F40395AA15E92F47000F7DFE /* SGHTTPURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */; };
 		F40395B015E93193000F7DFE /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F40395AF15E93193000F7DFE /* CFNetwork.framework */; };
 		F4BBDEB915E80D79000C9546 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4BBDEB815E80D79000C9546 /* UIKit.framework */; };
 		F4BBDEBB15E80D79000C9546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4BBDEBA15E80D79000C9546 /* Foundation.framework */; };
@@ -24,9 +24,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F40395A815E92F47000F7DFE /* SGURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGURLProtocol.h; sourceTree = "<group>"; };
-		F40395A915E92F47000F7DFE /* SGURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGURLProtocol.m; sourceTree = "<group>"; };
+		F40395A815E92F47000F7DFE /* SGHTTPURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGHTTPURLProtocol.h; sourceTree = "<group>"; };
+		F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGHTTPURLProtocol.m; sourceTree = "<group>"; };
 		F40395AF15E93193000F7DFE /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		F4AE2B4615ECEAF600882CC2 /* SGURLProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGURLProtocol.h; sourceTree = "<group>"; };
 		F4BBDEB415E80D79000C9546 /* SGURLProtocol.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SGURLProtocol.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BBDEB815E80D79000C9546 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F4BBDEBA15E80D79000C9546 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -101,8 +102,9 @@
 		F4BBDEBE15E80D79000C9546 /* SGURLProtocol */ = {
 			isa = PBXGroup;
 			children = (
-				F40395A815E92F47000F7DFE /* SGURLProtocol.h */,
-				F40395A915E92F47000F7DFE /* SGURLProtocol.m */,
+				F4AE2B4615ECEAF600882CC2 /* SGURLProtocol.h */,
+				F40395A815E92F47000F7DFE /* SGHTTPURLProtocol.h */,
+				F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */,
 				F4F91D3115EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.h */,
 				F4F91D3215EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m */,
 				F4F91D3415EA1BFF003FB322 /* SGHTTPURLResponse.h */,
@@ -192,7 +194,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F40395AA15E92F47000F7DFE /* SGURLProtocol.m in Sources */,
+				F40395AA15E92F47000F7DFE /* SGHTTPURLProtocol.m in Sources */,
 				F4F91D2D15EA1B5B003FB322 /* main.m in Sources */,
 				F4F91D2E15EA1B5B003FB322 /* SGAppDelegate.m in Sources */,
 				F4F91D3015EA1B5B003FB322 /* SGViewController.m in Sources */,

@@ -13,7 +13,6 @@
 /*  Returns nil if the ref is not suitable
  */
 - (id)initWithResponse:(CFHTTPMessageRef)response
-    proposedCredential:(NSURLCredential *)credential
   previousFailureCount:(NSInteger)failureCount
        failureResponse:(NSHTTPURLResponse *)URLResponse
                 sender:(id <NSURLAuthenticationChallengeSender>)sender
@@ -93,9 +92,8 @@
                                                                   authenticationMethod:authenticationMethod];
     CFRelease(realm);
     
-    if (!credential) {
-        credential = [[NSURLCredentialStorage sharedCredentialStorage] defaultCredentialForProtectionSpace:protectionSpace];
-    }
+    NSURLCredential *credential = [[NSURLCredentialStorage sharedCredentialStorage]
+                                   defaultCredentialForProtectionSpace:protectionSpace];
     
     self = [self initWithProtectionSpace:protectionSpace
                       proposedCredential:credential

@@ -7,6 +7,7 @@
 //
 
 #import "SGHTTPURLResponse.h"
+#import "SGURLProtocol.h"
 
 @implementation NSHTTPURLResponse (SGHTTPConnectionAdditions)
 

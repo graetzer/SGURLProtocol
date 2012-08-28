@@ -6,16 +6,13 @@
 //  Copyright (c) 2012 Simon Grätzer. All rights reserved.
 //
 
-#import "SGURLProtocol.h"
-#import "SGHTTPURLResponse.h"
-#import "SGHTTPAuthenticationChallenge.h"
-#import "NSData+Compress.h"
+#import "SGHTTPURLProtocol.h"
 
 static BOOL							TrustSelfSignedCertificates  = NO;
 static NSInteger					RegisterCount				 = 0;
 static NSLock*                      VariableLock                 = nil;
 
-@implementation SGURLProtocol
+@implementation SGHTTPURLProtocol
 @synthesize buffer = _buffer;
 
 + (void)load {
@@ -72,6 +69,7 @@ static NSLock*                      VariableLock                 = nil;
                 cachedResponse:cachedResponse
                         client:client]) {
         _HTTPMessage = [self newMessageWithURLRequest:request];
+        _authenticationAttempts = -1;
     }
     return self;
 }
@@ -124,12 +122,6 @@ static NSLock*                      VariableLock                 = nil;
         CFHTTPMessageRef response = (__bridge CFHTTPMessageRef)[theStream propertyForKey:(NSString *)kCFStreamPropertyHTTPResponseHeader];
         if (response && CFHTTPMessageIsHeaderComplete(response))
         {
-#ifdef DEBUG
-            CFHTTPMessageRef request = (__bridge CFHTTPMessageRef)([theStream propertyForKey:(NSString *)kCFStreamPropertyHTTPFinalRequest]);
-            NSDictionary *headers = (__bridge NSDictionary *)CFHTTPMessageCopyAllHeaderFields(request);
-            DLog(@"Request headers: %@", headers);
-#endif
-            
             // Construct a NSURLResponse object from the HTTP message
             NSURL *URL = [theStream propertyForKey:(NSString *)kCFStreamPropertyHTTPFinalURL];
             NSHTTPURLResponse *HTTPResponse = [NSHTTPURLResponse responseWithURL:URL HTTPMessage:response];
@@ -146,7 +138,6 @@ static NSLock*                      VariableLock                 = nil;
                 NSAssert(!self.authChallenge,
                          @"Authentication challenge received while another is in progress");
                 self.authChallenge = [[SGHTTPAuthenticationChallenge alloc] initWithResponse:response
-                                                                                proposedCredential:nil
                                                                               previousFailureCount:_authenticationAttempts
                                                                                    failureResponse:HTTPResponse
                                                                                             sender:self];
@@ -170,8 +161,6 @@ static NSLock*                      VariableLock                 = nil;
                     
                     [self stopLoading];
                     [self.client URLProtocol:self wasRedirectedToRequest:nextRequest redirectResponse:HTTPResponse];
-                    //[self.client URLProtocol:self didReceiveResponse:HTTPResponse cacheStoragePolicy:NSURLCacheStorageNotAllowed];
-                    //[self.client URLProtocolDidFinishLoading:self];
                     return;
                 }
             } else if (code == 307 || code == 308) {
@@ -227,16 +216,16 @@ static NSLock*                      VariableLock                 = nil;
             
         case NSStreamEventEndEncountered:{   // Report the end of the stream to the delegate
             NSString *encoding = [self.URLResponse.allHeaderFields objectForKey:@"Content-Encoding"];
+            NSData *decoded = self.buffer;
+            
             if ([encoding isEqualToString:@"gzip"]) {
-                NSData *uncompressed = [self.buffer gzipInflate];
-                [self.client URLProtocol:self didLoadData:uncompressed];
+                decoded = [self.buffer gzipInflate];
             } else if ([encoding isEqualToString:@"deflate"]) {
-                NSData *uncompressed = [self.buffer zlibInflate];
-                [self.client URLProtocol:self didLoadData:uncompressed];
-            } else {
-                [self.client URLProtocol:self didLoadData:self.buffer];
+                decoded = [self.buffer zlibInflate];
             }
+            [self.client URLProtocol:self didLoadData:decoded];
             [self.client URLProtocolDidFinishLoading:self];
+            
             break;
         }
             
@@ -264,12 +253,7 @@ static NSLock*                      VariableLock                 = nil;
                                               (__bridge CFStringRef)[request HTTPMethod],
                                               (__bridge CFURLRef)[request URL],
                                               kCFHTTPVersion1_1);
-    for (NSString *key in request.allHTTPHeaderFields) {
-        NSString *val = [request.allHTTPHeaderFields objectForKey:key];
-        CFHTTPMessageSetHeaderFieldValue(message,
-                                         (__bridge CFStringRef)key,
-                                         (__bridge CFStringRef)val);
-    }
+
     
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Host"), (__bridge CFStringRef)request.URL.host);
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Accept-Charset"), CFSTR("utf-8, ISO-8859-1;q=0.7"));
@@ -290,11 +274,25 @@ static NSLock*                      VariableLock                 = nil;
         }
 
     }
+    
+    for (NSString *key in request.allHTTPHeaderFields) {
+        NSString *val = [request.allHTTPHeaderFields objectForKey:key];
+        CFHTTPMessageSetHeaderFieldValue(message,
+                                         (__bridge CFStringRef)key,
+                                         (__bridge CFStringRef)val);
+    }
         
     NSData *body = [request HTTPBody];
     if (body)
     {
-        CFHTTPMessageSetBody(message, (__bridge CFDataRef)body);
+        NSString *encoding = [request.allHTTPHeaderFields objectForKey:@"Transfer-Encoding"];
+        // Check if already encoded
+        if (encoding.length) {// || [encoding isEqualToString:@"identity"
+            CFHTTPMessageSetBody(message, (__bridge CFDataRef)body);
+        } else {
+            CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Transfer-Encoding"), CFSTR("gzip"));
+            CFHTTPMessageSetBody(message, (__bridge CFDataRef)[body gzipDeflate]);
+        }
     }
     return message;
 }
@@ -328,8 +326,7 @@ static NSLock*                      VariableLock                 = nil;
 }
 
 - (void)continueWithoutCredentialForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-    //[self cancelAuthenticationChallenge:challenge];
-    [self cancelAuthenticationChallenge:self];
+    [self cancelAuthenticationChallenge:challenge];
 }
 
 - (void)useCredential:(NSURLCredential *)credential forAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
