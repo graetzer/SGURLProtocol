@@ -1,27 +1,14 @@
 //
-//  SGURLProtocol.h
-//  SGProtocol
+//  SGURLHttpProtocol.h
+//  SGURLProtocol
 //
-//  Created by Simon Grätzer on 25.08.12.
+//  Created by Simon Grätzer on 28.08.12.
 //  Copyright (c) 2012 Simon Grätzer. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CFNetwork/CFNetwork.h>
-
-@class SGHTTPAuthenticationChallenge;
-@interface SGURLProtocol : NSURLProtocol <NSStreamDelegate, NSURLAuthenticationChallengeSender> {
-    CFHTTPMessageRef _HTTPMessage;
-    NSInteger                       _authenticationAttempts;
-}
-
-@property (strong, nonatomic) NSInputStream *HTTPStream;
-@property (strong, nonatomic) NSHTTPURLResponse *URLResponse;
-@property (strong, nonatomic) NSMutableData *buffer;
-@property (strong, nonatomic) SGHTTPAuthenticationChallenge *authChallenge;
+#ifndef SGURLProtocol_SGURLHttpProtocol_h
+#define SGURLProtocol_SGURLHttpProtocol_h
 
 
-+ (void) registerProtocol;
-+ (void) unregisterProtocol;
 
-@end
+#endif
