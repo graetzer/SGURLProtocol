@@ -8,9 +8,9 @@
 
 #import "SGHTTPURLProtocol.h"
 
-static BOOL							TrustSelfSignedCertificates  = NO;
-static NSInteger					RegisterCount				 = 0;
-static NSLock*                      VariableLock                 = nil;
+static NSInteger RegisterCount = 0;
+static NSLock* VariableLock;
+static __weak id<SGAuthDelegate> authDelegate;
 
 @implementation SGHTTPURLProtocol
 @synthesize buffer = _buffer;
@@ -37,18 +37,11 @@ static NSLock*                      VariableLock                 = nil;
 	[VariableLock unlock];
 }
 
-+ (void) setTrustSelfSignedCertificates:(BOOL)Trust{
-	[VariableLock lock];
-	TrustSelfSignedCertificates = Trust;
++ (void) setAuthDelegate:(id<SGAuthDelegate>)delegate {
+    [VariableLock lock];
+	authDelegate = delegate;
 	[VariableLock unlock];
 }
-
-+ (BOOL) getTrustSelfSignedCertificates{
-	[VariableLock lock];
-	return TrustSelfSignedCertificates;
-	[VariableLock unlock];
-}
-
 
 #pragma mark - NSURLProtocol
 + (BOOL)canInitWithRequest:(NSURLRequest *)request{
@@ -103,10 +96,6 @@ static NSLock*                      VariableLock                 = nil;
 }
 
 - (void)stopLoading {
-    // Support method to cancel the HTTP stream, but not change the delegate. Used for:
-    //  A) Cancelling the connection
-    //  B) Waiting to restart the connection while authentication takes place
-    //  C) Restarting the connection after an HTTP redirect
     [_HTTPStream close];
     _HTTPStream = nil;
 }
@@ -124,11 +113,11 @@ static NSLock*                      VariableLock                 = nil;
         {
             // Construct a NSURLResponse object from the HTTP message
             NSURL *URL = [theStream propertyForKey:(NSString *)kCFStreamPropertyHTTPFinalURL];
-            NSHTTPURLResponse *HTTPResponse = [NSHTTPURLResponse responseWithURL:URL HTTPMessage:response];
-            self.URLResponse = HTTPResponse;
-            [self handleCookiesWithURLResponse:HTTPResponse];
+            self.URLResponse = [NSHTTPURLResponse responseWithURL:URL HTTPMessage:response];
+            [self handleCookiesWithURLResponse:self.URLResponse];
             
-            NSUInteger code = [HTTPResponse statusCode];
+            NSUInteger code = [self.URLResponse statusCode];
+            
             // If the response was an authentication failure, try to request fresh credentials.
             if (code == 401 || code == 407)
             {
@@ -139,42 +128,49 @@ static NSLock*                      VariableLock                 = nil;
                          @"Authentication challenge received while another is in progress");
                 self.authChallenge = [[SGHTTPAuthenticationChallenge alloc] initWithResponse:response
                                                                               previousFailureCount:_authenticationAttempts
-                                                                                   failureResponse:HTTPResponse
+                                                                                   failureResponse:self.URLResponse
                                                                                             sender:self];
 
                 if (self.authChallenge) {
                     _authenticationAttempts++;
-                    [self.client URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
+                    [VariableLock lock];
+                    if (authDelegate) {
+                        [authDelegate URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
+                        [VariableLock unlock];
+                    } else {
+                        [VariableLock unlock];
+                        [self.client URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
+                    }
                     return; // Stops the delegate being sent a response received message
                 }
-            } else if (code == 301 ||code == 302 || code == 303) {
+            } else if (code == 301 ||code == 302 || code == 303) {// Redirect with a new GET request, assume the server processed the request
                 // http://en.wikipedia.org/wiki/HTTP_301 Handle 301 only if GET or HEAD
                 // TODO: Maybe implement 301 differently.
                 
-                NSString *location = [HTTPResponse.allHeaderFields objectForKey:@"Location"];
+                NSString *location = [self.URLResponse.allHeaderFields objectForKey:@"Location"];
                 NSURL *nextURL = [NSURL URLWithString:location relativeToURL:URL];
                 if (nextURL) {
                     DLog(@"Redirect to %@", location);
+                    [self stopLoading];
+                    
                     NSURLRequest *nextRequest = [NSURLRequest requestWithURL:nextURL
                                                                  cachePolicy:self.request.cachePolicy
                                                              timeoutInterval:self.request.timeoutInterval];
-                    
-                    [self stopLoading];
-                    [self.client URLProtocol:self wasRedirectedToRequest:nextRequest redirectResponse:HTTPResponse];
+                    [self.client URLProtocol:self wasRedirectedToRequest:nextRequest redirectResponse:self.URLResponse];
                     return;
                 }
-            } else if (code == 307 || code == 308) {
-                NSString *location = [HTTPResponse.allHeaderFields objectForKey:@"Location"];
+            } else if (code == 307 || code == 308) { // Redirect but keep the parameters
+                NSString *location = [self.URLResponse.allHeaderFields objectForKey:@"Location"];
                 NSURL *nextURL = [NSURL URLWithString:location relativeToURL:URL];
                 
                 // If URL is valid, else just show the page
                 if (nextURL) {
                     DLog(@"Redirect to %@", location);
+                    [self stopLoading];
+                    
                     NSMutableURLRequest *nextRequest = [self.request mutableCopy];
                     [nextRequest setURL:nextURL];
-                    
-                    [self stopLoading];
-                    [self.client URLProtocol:self wasRedirectedToRequest:nextRequest redirectResponse:HTTPResponse];
+                    [self.client URLProtocol:self wasRedirectedToRequest:nextRequest redirectResponse:self.URLResponse];
                     return;
                 }
             } else if (code == 304) { // Handle cached stuff

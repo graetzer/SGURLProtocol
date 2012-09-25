@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F40395AA15E92F47000F7DFE /* SGHTTPURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */; };
 		F40395B015E93193000F7DFE /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F40395AF15E93193000F7DFE /* CFNetwork.framework */; };
+		F40DFBB11612471E005CE2F3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F40DFBB01612471E005CE2F3 /* Default-568h@2x.png */; };
 		F4BBDEB915E80D79000C9546 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4BBDEB815E80D79000C9546 /* UIKit.framework */; };
 		F4BBDEBB15E80D79000C9546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4BBDEBA15E80D79000C9546 /* Foundation.framework */; };
 		F4BBDEBD15E80D79000C9546 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4BBDEBC15E80D79000C9546 /* CoreGraphics.framework */; };
@@ -27,6 +28,7 @@
 		F40395A815E92F47000F7DFE /* SGHTTPURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGHTTPURLProtocol.h; sourceTree = "<group>"; };
 		F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGHTTPURLProtocol.m; sourceTree = "<group>"; };
 		F40395AF15E93193000F7DFE /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		F40DFBB01612471E005CE2F3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F4AE2B4615ECEAF600882CC2 /* SGURLProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGURLProtocol.h; sourceTree = "<group>"; };
 		F4BBDEB415E80D79000C9546 /* SGURLProtocol.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SGURLProtocol.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4BBDEB815E80D79000C9546 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -71,6 +73,7 @@
 		F4BBDEA915E80D79000C9546 = {
 			isa = PBXGroup;
 			children = (
+				F40DFBB01612471E005CE2F3 /* Default-568h@2x.png */,
 				F4F91D1F15EA1B5B003FB322 /* Demo */,
 				F4BBDEBE15E80D79000C9546 /* SGURLProtocol */,
 				F4BBDEB715E80D79000C9546 /* Frameworks */,
@@ -184,6 +187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4F91D2C15EA1B5B003FB322 /* SGViewController.xib in Resources */,
+				F40DFBB11612471E005CE2F3 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

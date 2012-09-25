@@ -10,6 +10,15 @@
 #import <CFNetwork/CFNetwork.h>
 #import "SGURLProtocol.h"
 
+@protocol SGAuthDelegate <NSObject>
+
+- (void)URLProtocol:(NSURLProtocol *)protocol didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+//
+//@optional
+//- (void)URLProtocol:(NSURLProtocol *)protocol didCancelAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+
+@end
+
 @class SGHTTPAuthenticationChallenge;
 @interface SGHTTPURLProtocol : NSURLProtocol <NSStreamDelegate, NSURLAuthenticationChallengeSender> {
     CFHTTPMessageRef _HTTPMessage;
@@ -21,8 +30,8 @@
 @property (strong, nonatomic) NSMutableData *buffer;
 @property (strong, nonatomic) SGHTTPAuthenticationChallenge *authChallenge;
 
-
 + (void) registerProtocol;
 + (void) unregisterProtocol;
++ (void) setAuthDelegate:(id<SGAuthDelegate>)delegate;
 
 @end
