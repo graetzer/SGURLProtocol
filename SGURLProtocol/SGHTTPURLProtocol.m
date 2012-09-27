@@ -10,13 +10,26 @@
 
 static NSInteger RegisterCount = 0;
 static NSLock* VariableLock;
-static __weak id<SGAuthDelegate> authDelegate;
+static NSMutableArray *Requests;
+static NSMutableArray *AuthDelegates;
 
-@implementation SGHTTPURLProtocol
-@synthesize buffer = _buffer;
+@interface SGHTTPURLProtocol ()
+@property (strong, nonatomic) NSInputStream *HTTPStream;
+@property (strong, nonatomic) NSHTTPURLResponse *URLResponse;
+@property (strong, nonatomic) NSMutableData *buffer;
+@property (strong, nonatomic) SGHTTPAuthenticationChallenge *authChallenge;
+@end
+
+@implementation SGHTTPURLProtocol {
+    CFHTTPMessageRef _HTTPMessage;
+    NSInteger _authenticationAttempts;
+    id<SGAuthDelegate> _authDelegate;
+}
 
 + (void)load {
     VariableLock = [[NSLock alloc] init];
+    Requests = [[NSMutableArray alloc] initWithCapacity:10];
+    AuthDelegates = [[NSMutableArray alloc] initWithCapacity:10];
 }
 
 + (void)registerProtocol {
@@ -37,10 +50,27 @@ static __weak id<SGAuthDelegate> authDelegate;
 	[VariableLock unlock];
 }
 
-+ (void) setAuthDelegate:(id<SGAuthDelegate>)delegate {
++ (void) setAuthDelegate:(id<SGAuthDelegate>)delegate forRequest:(NSURLRequest *)request {
     [VariableLock lock];
-	authDelegate = delegate;
+	[AuthDelegates addObject:delegate];
+    [Requests addObject:request];
 	[VariableLock unlock];
+}
+
++ (id<SGAuthDelegate>)authDelegateForRequest:(NSURLRequest *)request {
+    [VariableLock lock];
+    id<SGAuthDelegate> result;
+	for (int i = 0; i < Requests.count; i++) {
+        NSURLRequest *current = [Requests objectAtIndex:i];
+        if ([current.URL isEqual:request.URL]) {
+            result = [AuthDelegates objectAtIndex:i];
+            [Requests removeObjectAtIndex:i];
+            [AuthDelegates removeObjectAtIndex:i];
+            break;
+        }
+    }
+	[VariableLock unlock];
+    return result;
 }
 
 #pragma mark - NSURLProtocol
@@ -51,24 +81,35 @@ static __weak id<SGAuthDelegate> authDelegate;
 
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
 {
-    return request;
+    
+    NSURL *url = request.URL;
+	NSString *frag = url.fragment;
+	if(frag.length > 0)
+    { // map different fragments to same base file
+        NSMutableURLRequest *mutable = [request mutableCopy];
+        NSString *s = [url absoluteString];
+        s  =[s substringToIndex:s.length - frag.length];	// remove fragment
+        mutable.URL = [NSURL URLWithString:s];
+        return mutable;
+    }
+	return request;
 }
 
 - (id)initWithRequest:(NSURLRequest *)request
        cachedResponse:(NSCachedURLResponse *)cachedResponse
                client:(id<NSURLProtocolClient>)client {
-    DLog(@"%@", request);
     if (self = [super initWithRequest:request
                 cachedResponse:cachedResponse
                         client:client]) {
         _HTTPMessage = [self newMessageWithURLRequest:request];
         _authenticationAttempts = -1;
+        _authDelegate = [SGHTTPURLProtocol authDelegateForRequest:request];
     }
     return self;
 }
 
 - (void)dealloc {
-    self.HTTPStream = nil;
+    [self stopLoading];
     CFRelease(_HTTPMessage);
     NSAssert(!_HTTPStream, @"Deallocating HTTP connection while stream still exists");
     NSAssert(!_authChallenge, @"HTTP connection deallocated mid-authentication");
@@ -96,8 +137,10 @@ static __weak id<SGAuthDelegate> authDelegate;
 }
 
 - (void)stopLoading {
-    [_HTTPStream close];
-    _HTTPStream = nil;
+    if (_HTTPStream && _HTTPStream.streamStatus != NSStreamStatusClosed) {
+        [self.HTTPStream close];
+    }
+    self.HTTPStream = nil;
 }
 
 #pragma mark - CFStreamDelegate
@@ -117,37 +160,41 @@ static __weak id<SGAuthDelegate> authDelegate;
             [self handleCookiesWithURLResponse:self.URLResponse];
             
             NSUInteger code = [self.URLResponse statusCode];
+            NSString *location = [self.URLResponse.allHeaderFields objectForKey:@"Location"];
             
             // If the response was an authentication failure, try to request fresh credentials.
-            if (code == 401 || code == 407)
-            {
+            if (code == 401 || code == 407) {// The && statement is a workaround for servers who redirect with an 401 after an successful auth
                 // Cancel any further loading and ask the delegate for authentication
                 [self stopLoading];
                 
                 NSAssert(!self.authChallenge,
                          @"Authentication challenge received while another is in progress");
                 self.authChallenge = [[SGHTTPAuthenticationChallenge alloc] initWithResponse:response
-                                                                              previousFailureCount:_authenticationAttempts
+                                                                              previousFailureCount:_authenticationAttempts+1
                                                                                    failureResponse:self.URLResponse
                                                                                             sender:self];
 
                 if (self.authChallenge) {
+                    if (_authenticationAttempts == -1 && self.authChallenge.proposedCredential) {
+                        [self useCredential:self.authChallenge.proposedCredential forAuthenticationChallenge:self.authChallenge];
+                        return;
+                    }
+                    
                     _authenticationAttempts++;
-                    [VariableLock lock];
-                    if (authDelegate) {
-                        [authDelegate URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
-                        [VariableLock unlock];
+                    if (_authDelegate) {
+                        [_authDelegate URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
                     } else {
-                        [VariableLock unlock];
                         [self.client URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
                     }
                     return; // Stops the delegate being sent a response received message
+                } else {
+                    [self.client URLProtocol:self didFailWithError:[NSError errorWithDomain:@"org.graetzer.http" code:401 userInfo:nil]];
                 }
-            } else if (code == 301 ||code == 302 || code == 303) {// Redirect with a new GET request, assume the server processed the request
+            } else if (code == 301 ||code == 302 || code == 303) { // Workaround
+                // Redirect with a new GET request, assume the server processed the request
                 // http://en.wikipedia.org/wiki/HTTP_301 Handle 301 only if GET or HEAD
                 // TODO: Maybe implement 301 differently.
                 
-                NSString *location = [self.URLResponse.allHeaderFields objectForKey:@"Location"];
                 NSURL *nextURL = [NSURL URLWithString:location relativeToURL:URL];
                 if (nextURL) {
                     DLog(@"Redirect to %@", location);
@@ -160,7 +207,6 @@ static __weak id<SGAuthDelegate> authDelegate;
                     return;
                 }
             } else if (code == 307 || code == 308) { // Redirect but keep the parameters
-                NSString *location = [self.URLResponse.allHeaderFields objectForKey:@"Location"];
                 NSURL *nextURL = [NSURL URLWithString:location relativeToURL:URL];
                 
                 // If URL is valid, else just show the page
@@ -194,12 +240,19 @@ static __weak id<SGAuthDelegate> authDelegate;
     switch (streamEvent)
     {
             
-        case NSStreamEventOpenCompleted:
-            self.buffer = [[NSMutableData alloc] initWithCapacity:1024*1024];
-            break;
+//        case NSStreamEventOpenCompleted:
+//            
+//            break;
             
         case NSStreamEventHasBytesAvailable:
         {
+            if (!self.buffer) {
+                NSUInteger capacity = (NSUInteger)[[self.URLResponse.allHeaderFields objectForKey:@"Content-Length"] integerValue];
+                if (capacity == 0)
+                    capacity = 1024*1024;
+                self.buffer = [[NSMutableData alloc] initWithCapacity:capacity];
+            }
+            
             while ([theStream hasBytesAvailable])
             {
                 uint8_t buf[1024];
@@ -226,13 +279,13 @@ static __weak id<SGAuthDelegate> authDelegate;
         }
             
         case NSStreamEventErrorOccurred:{    // Report an error in the stream as the operation failing
-            ELog(@"An error occured")
+            ELog(@"An stream error occured")
             [self.client URLProtocol:self didFailWithError:[theStream streamError]];
             break;
         }
             
         default: {
-            DLog(@"Error: Unhandled event %i", streamEvent);
+            DLog(@"Unhandled event %i", streamEvent);
         }
     }
 }
@@ -252,9 +305,8 @@ static __weak id<SGAuthDelegate> authDelegate;
 
     
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Host"), (__bridge CFStringRef)request.URL.host);
-    CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Accept-Charset"), CFSTR("utf-8, ISO-8859-1;q=0.7"));
+    CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Accept-Charset"), CFSTR("utf-8;q=1.0, ISO-8859-1;q=0.5"));
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Accept-Encoding"), CFSTR("gzip;q=1.0, deflate;q=0.6, identity;q=0.5, *;q=0"));
-    //CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Cache-Control"), CFSTR("Keep-Alive"));
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Connection"), CFSTR("Keep-Alive"));
 
     if (request.HTTPShouldHandleCookies) {
@@ -311,14 +363,12 @@ static __weak id<SGAuthDelegate> authDelegate;
 {
     NSParameterAssert(challenge == [self authChallenge]);
     self.authChallenge = nil;
+    [self stopLoading];
     
     [self.client URLProtocol:self didCancelAuthenticationChallenge:challenge];
     [self.client URLProtocol:self didFailWithError:challenge.error];
-    
-    [self.client URLProtocol:self didReceiveResponse:[challenge failureResponse] cacheStoragePolicy:NSURLCacheStorageNotAllowed];
-    // Treat like a -cancel message
-    [self stopLoading];
-    [self.client URLProtocolDidFinishLoading:self];
+    //[self.client URLProtocol:self didReceiveResponse:[challenge failureResponse] cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+    //[self.client URLProtocolDidFinishLoading:self];
 }
 
 - (void)continueWithoutCredentialForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
@@ -330,14 +380,19 @@ static __weak id<SGAuthDelegate> authDelegate;
     NSParameterAssert(challenge == [self authChallenge]);
     self.authChallenge = nil;
     
+    DLog(@"Try to use user: %@", credential.user);
     // Retry the request, this time with authentication // TODO: What if this function fails?
     CFHTTPAuthenticationRef HTTPAuthentication = [(SGHTTPAuthenticationChallenge *)challenge CFHTTPAuthentication];
-    CFHTTPMessageApplyCredentials(_HTTPMessage,
-                                  HTTPAuthentication,
-                                  (__bridge CFStringRef)[credential user],
-                                  (__bridge CFStringRef)[credential password],
-                                  NULL);
-    [self startLoading];
+    if (HTTPAuthentication) {
+        CFHTTPMessageApplyCredentials(_HTTPMessage,
+                                      HTTPAuthentication,
+                                      (__bridge CFStringRef)[credential user],
+                                      (__bridge CFStringRef)[credential password],
+                                      NULL);
+        [self startLoading];
+    } else {
+        [self cancelAuthenticationChallenge:challenge];
+    }
 }
 
 -  (void)performDefaultHandlingForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {

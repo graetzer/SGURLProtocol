@@ -19,19 +19,10 @@
 
 @end
 
-@class SGHTTPAuthenticationChallenge;
-@interface SGHTTPURLProtocol : NSURLProtocol <NSStreamDelegate, NSURLAuthenticationChallengeSender> {
-    CFHTTPMessageRef _HTTPMessage;
-    NSInteger                       _authenticationAttempts;
-}
-
-@property (strong, nonatomic) NSInputStream *HTTPStream;
-@property (strong, nonatomic) NSHTTPURLResponse *URLResponse;
-@property (strong, nonatomic) NSMutableData *buffer;
-@property (strong, nonatomic) SGHTTPAuthenticationChallenge *authChallenge;
+@interface SGHTTPURLProtocol : NSURLProtocol <NSStreamDelegate, NSURLAuthenticationChallengeSender>
 
 + (void) registerProtocol;
 + (void) unregisterProtocol;
-+ (void) setAuthDelegate:(id<SGAuthDelegate>)delegate;
++ (void) setAuthDelegate:(id<SGAuthDelegate>)delegate forRequest:(NSURLRequest *)request;
 
 @end
