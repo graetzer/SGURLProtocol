@@ -167,24 +167,23 @@ static NSMutableArray *AuthDelegates;
                 // Cancel any further loading and ask the delegate for authentication
                 [self stopLoading];
                 
-                NSAssert(!self.authChallenge,
-                         @"Authentication challenge received while another is in progress");
+                NSAssert(!self.authChallenge, @"Authentication challenge received while another is in progress");
+                
                 self.authChallenge = [[SGHTTPAuthenticationChallenge alloc] initWithResponse:response
-                                                                              previousFailureCount:_authenticationAttempts+1
+                                                                              previousFailureCount:_authenticationAttempts
                                                                                    failureResponse:self.URLResponse
                                                                                             sender:self];
 
                 if (self.authChallenge) {
-                    if (_authenticationAttempts == -1 && self.authChallenge.proposedCredential) {
-                        [self useCredential:self.authChallenge.proposedCredential forAuthenticationChallenge:self.authChallenge];
-                        return;
-                    }
-                    
                     _authenticationAttempts++;
-                    if (_authDelegate) {
-                        [_authDelegate URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
+                    if (_authenticationAttempts == 0 && self.authChallenge.proposedCredential) {
+                        [self useCredential:self.authChallenge.proposedCredential forAuthenticationChallenge:self.authChallenge];
                     } else {
-                        [self.client URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
+                        if (_authDelegate) {
+                            [_authDelegate URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
+                        } else {
+                            [self.client URLProtocol:self didReceiveAuthenticationChallenge:self.authChallenge];
+                        }
                     }
                     return; // Stops the delegate being sent a response received message
                 } else {
