@@ -351,7 +351,7 @@ typedef enum {
                                               (__bridge CFURLRef)[request URL],
                                               kCFHTTPVersion1_1);
 
-    NSString *locale = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
+    NSString *locale = [NSLocale preferredLanguages][0];
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Host"), (__bridge CFStringRef)request.URL.host);
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Accept-Language"), (__bridge CFStringRef)locale);
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Accept-Charset"), CFSTR("utf-8;q=1.0, ISO-8859-1;q=0.5"));
