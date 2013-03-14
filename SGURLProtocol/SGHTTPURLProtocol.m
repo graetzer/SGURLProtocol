@@ -8,10 +8,9 @@
 
 #import "SGHTTPURLProtocol.h"
 
-static NSInteger RegisterCount = 0;
 static BOOL SSLValidatesCertificateChain = NO;
 __strong static NSLock* VariableLock;
-__strong static id<SGHTTPAuthDelegate> AuthDelegate;
+__weak static id<SGHTTPAuthDelegate> AuthDelegate;
 __strong static NSMutableDictionary *HTTPHeaderFields;
 
 typedef enum {
@@ -25,8 +24,6 @@ typedef enum {
     NSInputStream *_HTTPStream;
     CFHTTPMessageRef _HTTPMessage;
     
-    //Response
-    NSHTTPURLResponse *_URLResponse;
     NSInteger _authenticationAttempts;
     
     NSMutableData *_buffer;
@@ -39,27 +36,25 @@ typedef enum {
 }
 
 + (void)registerProtocol {
-	[VariableLock lock];
-	if (RegisterCount==0) {
-        [NSURLProtocol registerClass:[self class]];
-	}
-	RegisterCount++;
-	[VariableLock unlock];
+    [NSURLProtocol registerClass:[self class]];
 }
 
 + (void)unregisterProtocol {
-	[VariableLock lock];
-	RegisterCount--;
-	if (RegisterCount==0) {
-		[NSURLProtocol unregisterClass:[self class]];
-	}
-	[VariableLock unlock];
+    [NSURLProtocol unregisterClass:[self class]];
 }
 
 + (void)setAuthDelegate:(id<SGHTTPAuthDelegate>)delegate {
     [VariableLock lock];
     AuthDelegate = delegate;
 	[VariableLock unlock];
+}
+
++ (id<SGHTTPAuthDelegate>)authDelegate {
+    id<SGHTTPAuthDelegate> delegate;
+    [VariableLock lock];
+    delegate = AuthDelegate;
+	[VariableLock unlock];
+    return delegate;
 }
 
 + (void)setValue:(NSString *)value forHTTPHeaderField:(NSString *)field {
@@ -110,7 +105,6 @@ typedef enum {
         _compression = SGIdentity;
         _authenticationAttempts = -1;
         _HTTPMessage = [self newMessageWithURLRequest:request];
-        NSLog(@"Headers:\n%@", request.allHTTPHeaderFields);
     }
     return self;
 }
@@ -124,7 +118,7 @@ typedef enum {
 }
 
 - (void)startLoading {
-    NSAssert(_URLResponse, @"URLResponse is not nil, connection still ongoing");
+    NSAssert(_URLResponse == nil, @"URLResponse is not nil, connection still ongoing");
     NSAssert(_HTTPStream == nil, @"HTTPStream is not nil, connection still ongoing");
     
     if (self.cachedResponse) {// Doesn't seem to happen
@@ -269,12 +263,9 @@ typedef enum {
         if (location &&((statusCode >= 301 && statusCode <= 303) || statusCode == 307 || statusCode == 308)) {
             DLog(@"Redirect status code %d, Loc: %@", statusCode, location);
 
-            NSURL *nextURL = [NSURL URLWithString:location];
-            if (!nextURL)
-                nextURL = [NSURL URLWithString:location relativeToURL:URL];
-            
+            NSURL *nextURL = [NSURL URLWithString:location relativeToURL:URL];
             if (nextURL) {
-                NSMutableURLRequest *nextRequest;//
+                NSMutableURLRequest *nextRequest;
                 if (statusCode == 301 || statusCode == 307 || statusCode == 308) {
                     nextRequest = [self.request mutableCopy];
                     nextRequest.URL = nextURL;
@@ -282,11 +273,12 @@ typedef enum {
                     nextRequest = [NSMutableURLRequest requestWithURL:nextURL
                                                           cachePolicy:self.request.cachePolicy
                                                       timeoutInterval:self.request.timeoutInterval];
+                    [nextRequest setValue:[self.request valueForHTTPHeaderField:@"Accept"] forHTTPHeaderField:@"Accept"];
                 }
+                
                 NSString *referer = [self.request valueForHTTPHeaderField:@"Referer"];
                 if (!referer)
                     referer = self.request.URL.absoluteString;
-                
                 [nextRequest setValue:referer forHTTPHeaderField:@"Referer"];
                 [self.client URLProtocol:self wasRedirectedToRequest:nextRequest redirectResponse:_URLResponse];
             }
@@ -416,15 +408,12 @@ typedef enum {
 }
 
 - (void)handleCookiesWithURLResponse:(NSHTTPURLResponse *)response {
-//    NSString *cookieString = (response.allHeaderFields)[@"Set-Cookie"];
-//    if (cookieString) {
-        NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-        NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:response.allHeaderFields
-                                                                  forURL:response.URL];
-        [cookieStorage setCookies:cookies
-                           forURL:response.URL
-                  mainDocumentURL:self.request.mainDocumentURL];
-    //}
+    NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:response.allHeaderFields
+                                                              forURL:response.URL];
+    [cookieStorage setCookies:cookies
+                       forURL:response.URL
+              mainDocumentURL:self.request.mainDocumentURL];
 }
 
 #pragma mark - NSURLAuthenticationChallengeSender
