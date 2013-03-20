@@ -21,7 +21,6 @@
 		F4F91D2E15EA1B5B003FB322 /* SGAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F91D2615EA1B5B003FB322 /* SGAppDelegate.m */; };
 		F4F91D3015EA1B5B003FB322 /* SGViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F91D2A15EA1B5B003FB322 /* SGViewController.m */; };
 		F4F91D3315EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F91D3215EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m */; };
-		F4F91D3615EA1BFF003FB322 /* SGHTTPURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F91D3515EA1BFF003FB322 /* SGHTTPURLResponse.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,8 +48,6 @@
 		F4F91D2A15EA1B5B003FB322 /* SGViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGViewController.m; sourceTree = "<group>"; };
 		F4F91D3115EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGHTTPAuthenticationChallenge.h; sourceTree = "<group>"; };
 		F4F91D3215EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGHTTPAuthenticationChallenge.m; sourceTree = "<group>"; };
-		F4F91D3415EA1BFF003FB322 /* SGHTTPURLResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGHTTPURLResponse.h; sourceTree = "<group>"; };
-		F4F91D3515EA1BFF003FB322 /* SGHTTPURLResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGHTTPURLResponse.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,8 +107,6 @@
 				F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */,
 				F4F91D3115EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.h */,
 				F4F91D3215EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m */,
-				F4F91D3415EA1BFF003FB322 /* SGHTTPURLResponse.h */,
-				F4F91D3515EA1BFF003FB322 /* SGHTTPURLResponse.m */,
 				F4D1779015EAC4FE003B24C2 /* NSData+Compress.h */,
 				F4D1779115EAC4FE003B24C2 /* NSData+Compress.m */,
 			);
@@ -161,7 +156,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = SG;
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Simon Grätzer";
 			};
 			buildConfigurationList = F4BBDEAE15E80D79000C9546 /* Build configuration list for PBXProject "SGURLProtocol" */;
@@ -203,7 +198,6 @@
 				F4F91D2E15EA1B5B003FB322 /* SGAppDelegate.m in Sources */,
 				F4F91D3015EA1B5B003FB322 /* SGViewController.m in Sources */,
 				F4F91D3315EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m in Sources */,
-				F4F91D3615EA1BFF003FB322 /* SGHTTPURLResponse.m in Sources */,
 				F4D1779215EAC4FE003B24C2 /* NSData+Compress.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -237,6 +231,9 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -268,6 +265,9 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

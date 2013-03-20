@@ -71,7 +71,7 @@
     if ([error.domain isEqualToString:@"NSURLErrorDomain"])
     {
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Fehler beim laden der Seite"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading page"
                                                         message:[error localizedDescription]
                                                        delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"ok")
                                               otherButtonTitles: nil];
