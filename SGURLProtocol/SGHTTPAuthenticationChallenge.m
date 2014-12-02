@@ -30,7 +30,10 @@
     // Fail if we can't retrieve decent protection space info
     CFArrayRef authenticationDomains = CFHTTPAuthenticationCopyDomains(_HTTPAuthentication);
     NSURL *URL = [(__bridge NSArray *)authenticationDomains lastObject];
-    CFRelease(authenticationDomains);
+    if(authenticationDomains)
+    {
+      CFRelease(authenticationDomains);
+    }
     
     if (!URL || ![URL host])
         return nil;
