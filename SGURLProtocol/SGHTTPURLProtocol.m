@@ -304,18 +304,8 @@ typedef enum {
             
             NSURL *nextURL = [[NSURL URLWithString:location relativeToURL:URL] absoluteURL];            
             if (nextURL) {
-                NSMutableURLRequest *nextRequest;
-                if (statusCode == 307 || statusCode == 308) {
-                    nextRequest = [self.request mutableCopy];
-                    nextRequest.URL = nextURL;
-                } else {
-                    nextRequest = [NSMutableURLRequest requestWithURL:nextURL
-                                                          cachePolicy:self.request.cachePolicy
-                                                      timeoutInterval:self.request.timeoutInterval];
-                    [nextRequest setValue:[self.request valueForHTTPHeaderField:@"Accept"] forHTTPHeaderField:@"Accept"];
-                    [nextRequest setValue:[self.request valueForHTTPHeaderField:@"User-Agent"] forHTTPHeaderField:@"User-Agent"];
-                }
-                
+                NSMutableURLRequest *nextRequest = [self.request mutableCopy];
+                nextRequest.URL = nextURL;
                 NSString *referer = [self.request valueForHTTPHeaderField:@"Referer"];
                 if (!referer) referer = self.request.URL.absoluteString;
                 [nextRequest setValue:referer forHTTPHeaderField:@"Referer"];
