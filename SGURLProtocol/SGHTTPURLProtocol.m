@@ -405,7 +405,9 @@ typedef enum {
                                               kCFHTTPVersion1_1);
     if (message == NULL) return NULL;
 
-    NSString *locale = [[[NSLocale preferredLanguages] subarrayWithRange:NSMakeRange(0, 3)] componentsJoinedByString:@","];
+    NSArray* languages = [NSLocale preferredLanguages];
+    NSRange range = NSMakeRange(0, MIN(languages.count, 3));
+    NSString *locale = [[[NSLocale preferredLanguages] subarrayWithRange:range] componentsJoinedByString:@","];
     
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Host"), (__bridge CFStringRef)request.URL.host);
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Accept-Language"), (__bridge CFStringRef)locale);
