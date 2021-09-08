@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AAAB4B91AC34AB8000DD8D7 /* NSData+Compress.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4B81AC34AB8000DD8D7 /* NSData+Compress.m */; };
+		0AAAB4BC1AC34B3E000DD8D7 /* CanonicalRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AAAB4BB1AC34B3E000DD8D7 /* CanonicalRequest.m */; };
 		F40395AA15E92F47000F7DFE /* SGHTTPURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */; };
 		F40395B015E93193000F7DFE /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F40395AF15E93193000F7DFE /* CFNetwork.framework */; };
 		F40DFBB11612471E005CE2F3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F40DFBB01612471E005CE2F3 /* Default-568h@2x.png */; };
@@ -14,7 +16,6 @@
 		F4BBDEBB15E80D79000C9546 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4BBDEBA15E80D79000C9546 /* Foundation.framework */; };
 		F4BBDEBD15E80D79000C9546 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4BBDEBC15E80D79000C9546 /* CoreGraphics.framework */; };
 		F4D1778E15EAC361003B24C2 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F4D1778D15EAC361003B24C2 /* libz.dylib */; };
-		F4D1779215EAC4FE003B24C2 /* NSData+Compress.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D1779115EAC4FE003B24C2 /* NSData+Compress.m */; };
 		F4D66B5115E82E6F0084EA36 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4D66B5015E82E6F0084EA36 /* Security.framework */; };
 		F4F91D2C15EA1B5B003FB322 /* SGViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4F91D2215EA1B5B003FB322 /* SGViewController.xib */; };
 		F4F91D2D15EA1B5B003FB322 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F91D2415EA1B5B003FB322 /* main.m */; };
@@ -24,6 +25,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0AAAB4B71AC34AB8000DD8D7 /* NSData+Compress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Compress.h"; path = "Utility/NSData+Compress.h"; sourceTree = "<group>"; };
+		0AAAB4B81AC34AB8000DD8D7 /* NSData+Compress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+Compress.m"; path = "Utility/NSData+Compress.m"; sourceTree = "<group>"; };
+		0AAAB4BA1AC34B3E000DD8D7 /* CanonicalRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CanonicalRequest.h; path = Utility/CanonicalRequest.h; sourceTree = "<group>"; };
+		0AAAB4BB1AC34B3E000DD8D7 /* CanonicalRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CanonicalRequest.m; path = Utility/CanonicalRequest.m; sourceTree = "<group>"; };
 		F40395A815E92F47000F7DFE /* SGHTTPURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGHTTPURLProtocol.h; sourceTree = "<group>"; };
 		F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGHTTPURLProtocol.m; sourceTree = "<group>"; };
 		F40395AF15E93193000F7DFE /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -34,8 +39,6 @@
 		F4BBDEBA15E80D79000C9546 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F4BBDEBC15E80D79000C9546 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		F4D1778D15EAC361003B24C2 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		F4D1779015EAC4FE003B24C2 /* NSData+Compress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Compress.h"; sourceTree = "<group>"; };
-		F4D1779115EAC4FE003B24C2 /* NSData+Compress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Compress.m"; sourceTree = "<group>"; };
 		F4D66B5015E82E6F0084EA36 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		F4F91D2115EA1B5B003FB322 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F4F91D2315EA1B5B003FB322 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SGViewController.xib; sourceTree = "<group>"; };
@@ -102,13 +105,15 @@
 		F4BBDEBE15E80D79000C9546 /* SGURLProtocol */ = {
 			isa = PBXGroup;
 			children = (
+				0AAAB4BA1AC34B3E000DD8D7 /* CanonicalRequest.h */,
+				0AAAB4BB1AC34B3E000DD8D7 /* CanonicalRequest.m */,
+				0AAAB4B71AC34AB8000DD8D7 /* NSData+Compress.h */,
+				0AAAB4B81AC34AB8000DD8D7 /* NSData+Compress.m */,
 				F4AE2B4615ECEAF600882CC2 /* SGURLProtocol.h */,
 				F40395A815E92F47000F7DFE /* SGHTTPURLProtocol.h */,
 				F40395A915E92F47000F7DFE /* SGHTTPURLProtocol.m */,
 				F4F91D3115EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.h */,
 				F4F91D3215EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m */,
-				F4D1779015EAC4FE003B24C2 /* NSData+Compress.h */,
-				F4D1779115EAC4FE003B24C2 /* NSData+Compress.m */,
 			);
 			path = SGURLProtocol;
 			sourceTree = "<group>";
@@ -156,7 +161,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = SG;
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = "Simon Grätzer";
 			};
 			buildConfigurationList = F4BBDEAE15E80D79000C9546 /* Build configuration list for PBXProject "SGURLProtocol" */;
@@ -195,10 +200,11 @@
 			files = (
 				F40395AA15E92F47000F7DFE /* SGHTTPURLProtocol.m in Sources */,
 				F4F91D2D15EA1B5B003FB322 /* main.m in Sources */,
+				0AAAB4B91AC34AB8000DD8D7 /* NSData+Compress.m in Sources */,
+				0AAAB4BC1AC34B3E000DD8D7 /* CanonicalRequest.m in Sources */,
 				F4F91D2E15EA1B5B003FB322 /* SGAppDelegate.m in Sources */,
 				F4F91D3015EA1B5B003FB322 /* SGViewController.m in Sources */,
 				F4F91D3315EA1B9F003FB322 /* SGHTTPAuthenticationChallenge.m in Sources */,
-				F4D1779215EAC4FE003B24C2 /* NSData+Compress.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -228,18 +234,22 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -247,11 +257,15 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -262,20 +276,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
